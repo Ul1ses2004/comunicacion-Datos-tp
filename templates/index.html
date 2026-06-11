@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Simulador — Transmisión y Compresión de Señales</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <h1>Transmisión Digital y Compresión de Señales</h1>
+  <p>Simulador de procesamiento en entornos Cliente–Servidor</p>
+  <span class="badge">Grupo 12 · Etapa 2</span>
+</header>
+
+<!-- FUENTE -->
+<div class="panel">
+  <div class="panel-title">Fuente de señal</div>
+  <div class="source-tabs">
+    <button class="tab-btn active" onclick="setSource('sine')">📈 Seno sintético</button>
+    <button class="tab-btn" onclick="setSource('audio')">🎵 Audio WAV</button>
+  </div>
+
+  <div id="srcSine">
+    <p style="color:var(--muted);font-size:.85rem">Se genera un seno puro de 300 muestras (2 ciclos completos, 0 → 4π).</p>
+  </div>
+
+  <div id="srcAudio" style="display:none">
+    <div class="field" style="margin-bottom:12px">
+      <label style="margin-bottom:10px;display:block">Cargar archivo WAV</label>
+      <input type="file" id="audioFile" accept=".wav,audio/wav,audio/x-wav"
+             style="width:100%;padding:8px;background:var(--bg);border:1px solid var(--border);border-radius:7px;color:var(--text);cursor:pointer"
+             onchange="onAudioFileSelected(this)">
+      <p style="color:var(--muted);font-size:.8rem;margin-top:8px">
+        Al seleccionar el archivo se lee automáticamente y aparece la vista previa abajo.
+      </p>
+    </div>
+    <div id="audioStatus"></div>
+  </div>
+</div>
+
+<!-- PREVIEW -->
+<div id="previewPanel" class="panel" style="display:none">
+  <div class="panel-title">Vista previa — señal leída</div>
+  <p id="previewMeta" style="color:var(--muted);font-size:.84rem;margin-bottom:14px"></p>
+  <div class="chart-box">
+    <h4><span class="dot" style="background:#38bdf8"></span><span id="previewTitle">Señal cargada</span></h4>
+    <div class="chart-wrap" style="height:240px"><canvas id="cPreview"></canvas></div>
+  </div>
+</div>
+
+<!-- PARÁMETROS -->
+<div class="panel">
+  <div class="panel-title">Parámetros de transmisión</div>
+  <div class="controls">
+    <div class="field">
+      <label><span class="tag">Paso 2</span>Compresión</label>
+      <select id="compression">
+        <option value="none">Sin compresión</option>
+        <option value="samples">Submuestreo (1 de cada 6)</option>
+        <option value="quantization">Cuantización (8 niveles)</option>
+      </select>
+    </div>
+    <div class="field">
+      <label><span class="tag">Paso 3a</span>Ruido gaussiano</label>
+      <div class="range-row">
+        <input type="range" id="noise" min="0" max="100" value="0"
+               oninput="document.getElementById('noiseVal').textContent=this.value+'%'">
+        <span class="range-val" id="noiseVal">0%</span>
+      </div>
+    </div>
+    <div class="field">
+      <label><span class="tag">Paso 3b</span>Pérdida de paquetes</label>
+      <div class="range-row">
+        <input type="range" id="packetloss" min="0" max="50" value="0"
+               oninput="document.getElementById('plVal').textContent=this.value+'%'">
+        <span class="range-val" id="plVal">0%</span>
+      </div>
+    </div>
+  </div>
+  <div style="margin-top:16px;max-width:220px">
+    <button class="btn" id="btnTx" onclick="transmit()">
+      <span id="btnText">▶ Generar y Transmitir</span>
+      <div class="spinner" id="spinner" style="display:none"></div>
+    </button>
+  </div>
+</div>
+
+<!-- RESULTADOS -->
+<div id="results">
+  <div class="section-header">Paso 5 — Monitoreo y métricas de recepción</div>
+
+  <div class="pipeline">
+    <div class="pipe-step"><div class="icon">📡</div><div class="name">Original</div><div class="val" id="pp_orig">—</div></div>
+    <div class="pipe-arrow">→</div>
+    <div class="pipe-step"><div class="icon">🗜️</div><div class="name">Comprimido</div><div class="val" id="pp_comp">—</div></div>
+    <div class="pipe-arrow">→</div>
+    <div class="pipe-step"><div class="icon">📶</div><div class="name">Canal</div><div class="val" id="pp_canal">—</div></div>
+    <div class="pipe-arrow">→</div>
+    <div class="pipe-step"><div class="icon">🖥️</div><div class="name">Reconstruido</div><div class="val" id="pp_recon">—</div></div>
+  </div>
+
+  <div class="metrics">
+    <div class="metric"><p>Tamaño original</p><span id="m_orig">—</span></div>
+    <div class="metric"><p>Tamaño comprimido</p><span id="m_comp" style="color:var(--orange)">—</span></div>
+    <div class="metric"><p>Tasa de compresión</p><span id="m_pct" style="color:var(--primary)">—</span></div>
+    <div class="metric"><p>Ruido aplicado</p><span id="m_noise" style="color:var(--yellow)">—</span></div>
+    <div class="metric"><p>Pérdida de paquetes</p><span id="m_pl" style="color:var(--orange)">—</span></div>
+    <div class="metric"><p>Error MSE</p><span id="m_err" style="color:var(--red)">—</span></div>
+  </div>
+
+  <div class="chart-grid">
+    <div class="chart-box">
+      <h4><span class="dot" style="background:#38bdf8"></span>Señal Original</h4>
+      <div class="chart-wrap"><canvas id="cOrig"></canvas></div>
+    </div>
+    <div class="chart-row">
+      <div class="chart-box">
+        <h4><span class="dot" style="background:#fb923c"></span>Comprimida <span style="color:var(--muted);font-weight:400;text-transform:none">(antes de Tx)</span></h4>
+        <div class="chart-wrap"><canvas id="cComp"></canvas></div>
+      </div>
+      <div class="chart-box">
+        <h4><span class="dot" style="background:#facc15"></span>En canal <span style="color:var(--muted);font-weight:400;text-transform:none">(ruido + pérdidas)</span></h4>
+        <div class="chart-wrap"><canvas id="cChan"></canvas></div>
+      </div>
+    </div>
+    <div class="chart-box">
+      <h4>
+        <span class="dot" style="background:#38bdf8"></span>Original &nbsp;vs&nbsp;
+        <span class="dot" style="background:#f43f5e"></span>Reconstruida
+        <span style="color:var(--muted);font-weight:400;text-transform:none;margin-left:4px">(comparación directa)</span>
+      </h4>
+      <div class="chart-overlap-wrap"><canvas id="cOver"></canvas></div>
+    </div>
+  </div>
+</div>
+
+<footer>Simulador local · 100% offline tras primera ejecución · Grupo 12</footer>
+</div>
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
