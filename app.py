@@ -9,6 +9,6 @@ import runpy
 
 if __name__ == '__main__':
     runpy.run_path(
-        os.path.join(os.path.dirname(__file__), 'simulador_grupo12.pyw'),
+        os.path.join(os.path.dirname(__file__), 'simulador_grupo12_v2.pyw'),
         run_name='__main__',
     )

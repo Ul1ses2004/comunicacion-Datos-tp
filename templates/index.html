@@ -12,20 +12,19 @@
 
 <header>
   <h1>Transmisión Digital y Compresión de Señales</h1>
-  <p>Simulador de procesamiento en entornos Cliente–Servidor</p>
-  <span class="badge">Grupo 12 · Etapa 2</span>
+  <span class="badge">Grupo 12</span>
 </header>
 
 <!-- FUENTE -->
 <div class="panel">
   <div class="panel-title">Fuente de señal</div>
   <div class="source-tabs">
-    <button class="tab-btn active" onclick="setSource('sine')">📈 Seno sintético</button>
+    <button class="tab-btn active" onclick="setSource('sine')">📈 Función seno</button>
     <button class="tab-btn" onclick="setSource('audio')">🎵 Audio WAV</button>
   </div>
 
   <div id="srcSine">
-    <p style="color:var(--muted);font-size:.85rem">Se genera un seno puro de 300 muestras (2 ciclos completos, 0 → 4π).</p>
+    <p style="color:var(--muted);font-size:.85rem">Función seno (300 muestras).</p>
   </div>
 
   <div id="srcAudio" style="display:none">
@@ -57,15 +56,15 @@
   <div class="panel-title">Parámetros de transmisión</div>
   <div class="controls">
     <div class="field">
-      <label><span class="tag">Paso 2</span>Compresión</label>
+      <label>Compresión</label>
       <select id="compression">
         <option value="none">Sin compresión</option>
-        <option value="samples">Submuestreo (1 de cada 6)</option>
-        <option value="quantization">Cuantización (8 niveles)</option>
+        <option value="samples">Reducir muestras (al 83.3%)</option>
+        <option value="quantization">Reducir niveles de cuantización (8 niveles)</option>
       </select>
     </div>
     <div class="field">
-      <label><span class="tag">Paso 3a</span>Ruido gaussiano</label>
+      <label>Agregar ruido</label>
       <div class="range-row">
         <input type="range" id="noise" min="0" max="100" value="0"
                oninput="document.getElementById('noiseVal').textContent=this.value+'%'">
@@ -73,7 +72,7 @@
       </div>
     </div>
     <div class="field">
-      <label><span class="tag">Paso 3b</span>Pérdida de paquetes</label>
+      <label>Pérdida de paquetes</label>
       <div class="range-row">
         <input type="range" id="packetloss" min="0" max="50" value="0"
                oninput="document.getElementById('plVal').textContent=this.value+'%'">
@@ -91,7 +90,7 @@
 
 <!-- RESULTADOS -->
 <div id="results">
-  <div class="section-header">Paso 5 — Monitoreo y métricas de recepción</div>
+  <div class="section-header">Monitoreo y métricas de recepción</div>
 
   <div class="pipeline">
     <div class="pipe-step"><div class="icon">📡</div><div class="name">Original</div><div class="val" id="pp_orig">—</div></div>
@@ -119,7 +118,7 @@
     </div>
     <div class="chart-row">
       <div class="chart-box">
-        <h4><span class="dot" style="background:#fb923c"></span>Comprimida <span style="color:var(--muted);font-weight:400;text-transform:none">(antes de Tx)</span></h4>
+        <h4><span class="dot" style="background:#fb923c"></span>Comprimida <span style="color:var(--muted);font-weight:400;text-transform:none">(antes de Transmitir)</span></h4>
         <div class="chart-wrap"><canvas id="cComp"></canvas></div>
       </div>
       <div class="chart-box">
@@ -138,7 +137,7 @@
   </div>
 </div>
 
-<footer>Simulador local · 100% offline tras primera ejecución · Grupo 12</footer>
+<footer>Transmisión Digital de Señales y Compresión · Grupo 12</footer>
 </div>
 
 <script src="{{ url_for('static', filename='script.js') }}"></script>
