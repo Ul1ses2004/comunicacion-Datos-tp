@@ -1,48 +1,25 @@
 # Simulador de Transmisión y Compresión de Señales
 **Grupo 12 — Propuesta 4 · Etapa 2**
 
----
-
 ## Cómo ejecutar (Windows)
 
-1. Hacer **doble clic** en `EJECUTAR_WINDOWS.bat`  
-   *(alternativa: doble clic directo en `simulador_grupo12.pyw`)*
-2. La primera vez instalará Flask automáticamente (requiere internet)
-3. Se abre el navegador en `http://127.0.0.1:5050`
-4. Para cerrar: cerrar la ventana pequeña del simulador
+1. Descargar y hacer doble click al archivo "Simulador de Transmision.exe" que se encuentra en la carpeta root de este repositorio.
+2. Se iniciará automáticamente una aplicación en una pequeña ventana (el servidor), al mismo tiempo que se abrirá una pestaña en internet con la webapp (el cliente).
+3. Minimizar la pequeña ventana servidor, y utilizar la aplicación en la página que se ha abierto.
+4. Para salir del programa, simplemente cerrar la ventana servidor y cerrar la página que se abrió.
 
 ### Requisito
 Python 3 con PATH configurado → [python.org/downloads](https://www.python.org/downloads/)
 
----
-
 ## Uso de la aplicación
 
-| Paso | Qué hace |
+| Paso | Explicación |
 |------|----------|
-| **1. Fuente** | Elegir señal seno sintética o cargar un archivo `.wav` |
-| **Vista previa** | Al cargar el WAV (o al elegir seno) se **lee y grafica la señal al instante** |
-| **2. Compresión** | Sin compresión / Submuestreo / Cuantización (8 niveles) |
-| **3. Canal** | Ruido gaussiano (0–100 %) y pérdida de paquetes (0–50 %) |
-| **4. Transmitir** | Procesa la señal cargada y muestra compresión, canal y reconstrucción |
-| **5. Métricas** | Tamaños, tasa de compresión, MSE y gráficos comparativos |
-
----
-
-## Estructura del proyecto
-
-```
-simulador_señales/
-├── simulador_grupo12.pyw   ← Aplicación principal (doble clic)
-├── EJECUTAR_WINDOWS.bat    ← Lanzador Windows
-├── app.py                  ← Versión anterior (solo referencia)
-├── templates/index.html    ← Versión anterior del frontend
-└── README.md
-```
-
-> **Archivo principal:** `simulador_grupo12.pyw` — incluye servidor, lógica de señales e interfaz.
-
----
+| **1. Fuente** | Elegir la señal seno o cargar un archivo `.wav`. Se mostrará una vista previa con gráfica de la señal en cuestión.|
+| **2. Compresión** | Elegir el tipo de compresión a aplicar a la señal fuente: **[Sin compresión]:** no aplicar compresión a la señal. <br> **[Reducir muestras]:** utilizar menos puntos (o componentes) para reducir la señal. <br> **[Reducir niveles de cuantización]:** limitar las amplitudes utilizables a 9 valores distintos.
+| **3. Canal** | Agregar un porcentaje de ruido al canal (0–100%) que aleatoriamente distorsiona la señal, <br> Agregar un porcentaje de pérdida de paquetes (0–50%) de la señal que genera que se pierdan tramos de la misma. |
+| **4. Transmitir** | Aplica todas las configuraciones seleccionadas a la señal y las "transmite", mostrando la gráfica de cómo se veía originalmente, cómo es comprimida, cómo es en canal (es decir, mientra se transmite) y finalmente, una comparación de la original vs la transmitida. |
+| **5. Métricas** | Muestra tamaños, tasa de compresión, ruido y pérdida de paquetes y MSE |
 
 ## Funcionalidades vs consigna (Propuesta 4)
 
